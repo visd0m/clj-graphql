@@ -1,0 +1,32 @@
+{:objects {:Item         {:description "A single rss feed item"
+                          :fields      {:link           {:type (non-null String)}
+                                        :title          {:type (non-null String)}
+                                        :author         {:type (non-null String)}
+                                        :published_date {:type String}}}
+
+           :Subscription {:description "An rss feed subscription"
+                          :fields      {:id           {:type (non-null ID)}
+                                        :url          {:type (non-null String)}
+                                        :insert_date  {:type (non-null String)}
+                                        :update_date  {:type String}
+                                        :version      {:type (non-null Int)}
+                                        :order_unique {:type (non-null Int)}
+                                        :enabled      {:type (non-null Boolean)}}}
+
+           :FeedItem     {:description "A wrapper of a single rss feed item"
+                          :fields      {:id           {:type (non-null ID)}
+                                        :subscription {:type    :Subscription
+                                                       :resolve :FeedItem/subscription}
+                                        :item         {:type :Item}
+                                        :hash         {:type (non-null String)}
+                                        :order_unique {:type (non-null Int)}
+                                        :insert_date  {:type (non-null String)}
+                                        :update_date  {:type String}
+                                        :version      {:type (non-null Int)}}}}
+
+ :queries {:by_subscription_id {:type    (list :FeedItem)
+                                :args    {:id             {:type ID}
+                                          :starting_after {:type ID}
+                                          :limit          {:type          Int
+                                                           :default-value 20}}
+                                :resolve :query/by-subscription-id}}}
