@@ -1,5 +1,6 @@
 (ns clj-graphql.core
   (:use seesaw.core)
+  (:use clojure.java.browse)
   (:require [clojure.java.io :as io]
             [com.walmartlabs.lacinia.util :as util]
             [com.walmartlabs.lacinia.schema :as schema]
@@ -7,7 +8,8 @@
             [clj-http.client :as client]
             [clojure.edn :as edn]
             [cheshire.core :refer :all]
-            [clojure.walk :as walk])
+            [clojure.walk :as walk]
+            [seesaw.table :as table])
   (:import (clojure.lang IPersistentMap)))
 
 ; === utils
@@ -103,17 +105,22 @@
                           :author (str (get-in feed-item [:item :author]))})))
         table (table :model [:columns columns
                              :rows rows])]
+    (listen table :selection (fn [e]
+                               (when (.getValueIsAdjusting e)
+                                 (browse-url (:link (table/value-at table (selection table {:multi? false})))))))
     (scrollable table :column-header columns)))
 
 (defn display
   [title content width height]
   (let [window (frame :title title
-                      :content content
                       :width width
-                      :height height)]
-    (show! window)))
+                      :height height
+                      :content content)]
+    (-> window
+        show!)))
 
 (defn view-q
   [query-string]
-  (let [data (get-in (q query-string) [:data :by_subscription_id])]
-    (display "rss-feed" (to-table data) 500 500)))
+  (let [data (get-in (q query-string) [:data :by_subscription_id])
+        table (to-table data)]
+    (display "rss-feed" table 1920 500)))
