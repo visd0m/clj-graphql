@@ -24,9 +24,11 @@
                                         :update_date  {:type String}
                                         :version      {:type (non-null Int)}}}}
 
- :queries {:by_subscription_id {:type    (list :FeedItem)
-                                :args    {:id             {:type ID}
-                                          :starting_after {:type ID}
-                                          :limit          {:type          Int
-                                                           :default-value 20}}
-                                :resolve :query/by-subscription-id}}}
+ :queries {:feed_items_by_subscription_id {:type    (list :FeedItem)
+                                           :args    {:id             {:type ID}
+                                                     :starting_after {:type ID}
+                                                     :limit          {:type          Int
+                                                                      :default-value 20}}
+                                           :resolve :query/feed_items_by_subscription_id}
+           :all_subscriptions             {:type    (list :Subscription)
+                                           :resolve :query/all_subscriptions}}}
